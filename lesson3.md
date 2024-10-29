@@ -1,93 +1,142 @@
-/////////////////////////////////////////////////////////////////////////
-1 task 
-1. const counter = {}
-2. const counter = new Object()
-3. const counter = 
 
+## 1 task
+1. `const counter = {}`
+2. `const counter = new Object()`
+3. `const counter = Object.create(null)`
+4. `const counter = Object.assign({}, {})` - (возможный теоритически, менее удобный, созданный для копирования вариант)
 
+5. С помощью функции Конструктора.
+```js
+  function Counter(count) {
+    this.count = count;`
+  }
 
+  `const counter = new Counter('Alice', 30);`
+```
+6. С помощью обычной функции.
+```js
+function createCounter( count) {
+    return {
+        count,
+        countIncrem() {
+            console.log(this.count++)
+        }
+    };
+}
 
-
-/////////////////////////////////////////////////////////////////////////
-2 task
-Ключевая особенность - использование QUIC транспортного протокола вместо TPC.
-Что способствует установлению более быстрого соединению сетей и улучшению производительности
-
-
-
-/////////////////////////////////////////////////////////////////////////
-3 task 
-1. XMLHttpRequest предлагает метод - abort()
-2. Fetch API предлагает класс AbortController
-const controller = new AbortController();
-const signal = controller.signal;
-
-fetch("url", { signal })
-  .then(response => {
-    // Обработка ответа
-  })
-  .catch(err => {
-    if (err.name === 'AbortError') {
-      console.log('Запрос отменён');
+const counter = createCounter(30);
+```
+7. С помощью класса.
+```js
+class Counter {
+    constructor(count) {
+      this.count = count;
     }
-  });
+    countIncrem() {
+      console.log(this.count++)
+    }
+}
 
-// Отмена запроса
-controller.abort();
-3. Axios предлагает встроенный класс CancelToken, 
-при создании экзепляра которго коллбек принимает аргумент-функцию,
-с помощью которой можно отменить запрос.
+const counter = new Counter(30);
+```
 
+## 2 task
+```js
+const counter = {
+  count: 30,
+  countIncrem() {
+    this.count++
+  }
+}
+```
+Поверхностные копии: 
 
-/////////////////////////////////////////////////////////////////////////
-4 task
+1. `const counterCopy = Object.assign({}, counter) `
+2. `const counterCopy = {...counter}`
+3. `for in`
+```js
+const copy = {};
 
-1. 
-- const str = String(23);
-- const str = 'Hello';
-- const str = "Hello";
-- const str = `Hello`;
-- const str = `Hello` + 12;
-- const str = parseInt('12');
+for(let key in counter) {
+    copy[key] = counter[key];
+}
+```
+Глубокие копии
 
-2.
-- onst num = Number('23');
-- const num = 23;
-- const num = +'12';
-3.
-- const boolean = true;
-- const boolean = Boolean(2);
-- const boolean = !!1
-4.
-- const null = null;
-5.
-- const undef = undefined;
-- var undef;
-6. 
-- const symbol = Symbol("12");
-7. 
-- const bigInt = 12n;
-- const bigInt = BigInt(12);
-
-
-
-/////////////////////////////////////////////////////////////////////////
-5 task
-
-Переменные данного типа поддерживают Hoisting, но в отличие от var, 
-которому присваевается значение undefined, уходят в TDZ и не получают значения.
-Вследствии чего , при обращении до инициализации, мы получаем ошибку.
+1. `const counterCopy = JSON.parse(JSON.stringify(counter))`; (есть минусы с undefined, Date  и цикилческими ссылками объектов)
+2. Библиотеки
+```js
+  const lodash = require('lodash');
+  const counterCopy = lodash.cloneDeep(counter);
+```
+3. `const copy = structuredClone(counter)`
 
 
+4. Ручное копирование 
+```js
+function deepCopy(arg) {
+    if (arg === null || typeof arg !== 'object') return arg;
+    if(Array.isArray(arg)) return arg.map(deepCopy)
 
-/////////////////////////////////////////////////////////////////////////
-6 task
+    const copy = {};
+    for (const key in arg) {
+      copy[key] = deepCopy(arg[key]);
+    }
+    return copy;
+}
 
-const res = "B" + "a" + (1 - "hello");
-console.log(res); //BaNaN
 
-const res2 = (true && 3) + "d";
-console.log(res2); //3d
+```
 
-const res3 = Boolean(true && 3) + "d";
-console.log(res3); //trued
+
+## 3 task
+1. `function makeCounter() {}`
+2. `const makeCounter  = function() {}`
+3. `const makeCounter = () => {}`
+4. `function MakeCounter () {}`
+5. `const makeCounter  = function make() {}`
+6. IIFE
+```js
+(function makeCounter() {
+    console.log();
+})();
+```
+7. Cоздание внутри функции высшего порядка
+```js
+function make() {
+  return function makeCounter() {}
+}
+```
+
+
+
+## 4 task
+`structuredClone(obj)` - глобальный метод, выполняющий глубокое копирование объектов. Корректно работает с undefined, Date, 
+цикилческие ссылки объектов.
+
+
+
+## 1 bonus
+```js
+const deepEqual =(arg1, arg2) => {
+    if(typeof arg1 !== 'object' || typeof arg2 !== 'object')return arg1 === arg2;  
+    if(arg1 === arg2) return true;
+    if(Array.isArray(arg1)) return arg1.map((el, i) => deepEqual(el, arg2[i])).every(el => el === true);
+
+    for(const key in arg1) {
+        if(!deepEqual(arg1[key], arg2[key])) return false;
+    }
+
+
+    return true;
+};
+```
+
+
+
+## 2 bonus
+```js
+function reverseStr(str) {
+    return str.split("").reverse().join("");
+}
+```
