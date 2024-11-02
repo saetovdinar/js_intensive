@@ -1,142 +1,114 @@
 
 ## 1 task
-1. `const counter = {}`
-2. `const counter = new Object()`
-3. `const counter = Object.create(null)`
-4. `const counter = Object.assign({}, {})` - (возможный теоритически, менее удобный, созданный для копирования вариант)
+Признаки "непраильного" поведения массивов
+1. В JS маассивы могут хранить разные типы данных , что отличает их от других языков и могут 
+привести к небольшим путаницам
+2. К массивам можно добавлять свойства и методы, что копирует поведение объектов.
+3. Они могут вести себя как стеки и очереди.(pop, push, shift, unshift)
+4. Могут вести себя как матрицы
+5. Отсутсвие фиксированного размера
 
-5. С помощью функции Конструктора.
-```js
-  function Counter(count) {
-    this.count = count;`
-  }
-
-  `const counter = new Counter('Alice', 30);`
-```
-6. С помощью обычной функции.
-```js
-function createCounter( count) {
-    return {
-        count,
-        countIncrem() {
-            console.log(this.count++)
-        }
-    };
-}
-
-const counter = createCounter(30);
-```
-7. С помощью класса.
-```js
-class Counter {
-    constructor(count) {
-      this.count = count;
-    }
-    countIncrem() {
-      console.log(this.count++)
-    }
-}
-
-const counter = new Counter(30);
-```
 
 ## 2 task
 ```js
-const counter = {
-  count: 30,
-  countIncrem() {
-    this.count++
-  }
-}
-```
-Поверхностные копии: 
-
-1. `const counterCopy = Object.assign({}, counter) `
-2. `const counterCopy = {...counter}`
-3. `for in`
-```js
-const copy = {};
-
-for(let key in counter) {
-    copy[key] = counter[key];
-}
-```
-Глубокие копии
-
-1. `const counterCopy = JSON.parse(JSON.stringify(counter))`; (есть минусы с undefined, Date  и цикилческими ссылками объектов)
-2. Библиотеки
-```js
-  const lodash = require('lodash');
-  const counterCopy = lodash.cloneDeep(counter);
-```
-3. `const copy = structuredClone(counter)`
-
-
-4. Ручное копирование 
-```js
-function deepCopy(arg) {
-    if (arg === null || typeof arg !== 'object') return arg;
-    if(Array.isArray(arg)) return arg.map(deepCopy)
-
-    const copy = {};
-    for (const key in arg) {
-      copy[key] = deepCopy(arg[key]);
-    }
-    return copy;
+function logger() {
+    console.log(`I output only external context: ${this.item}`);
 }
 
+const obj = { item: "some value" };
+```
+Решение
+```js
+logger.call(obj)
+logger.apply(obj)
+
+const bindedLogger = logger.bind(obj)
+bindedLogger()
+```
+
+
+## 3.1 task
+
+```js
+1.
+let arr = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+
+arr.reduce((accum, item) => {
+    return accum + item
+}, 0)
+2.
+let arr = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'];
+
+arr.reduce((accum, item) => {
+    return accum + item
+}, '');
+
+
+3. let arr = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+Math.max(...arr)
+Math.min(...arr)
 
 ```
 
 
-## 3 task
-1. `function makeCounter() {}`
-2. `const makeCounter  = function() {}`
-3. `const makeCounter = () => {}`
-4. `function MakeCounter () {}`
-5. `const makeCounter  = function make() {}`
-6. IIFE
+
+
+## 3.2 task
+
+Stack
 ```js
-(function makeCounter() {
-    console.log();
-})();
-```
-7. Cоздание внутри функции высшего порядка
-```js
-function make() {
-  return function makeCounter() {}
+let arr = [];
+let elem = 0;
+function addElemToStack() {
+    arr.push(elem);
+    console.log(arr);
+    elem++;
 }
+
+function removeElemFromStack() {
+    arr.pop();
+    console.log(arr);
+}
+
+setInterval(addElemToStack, 500);
+setInterval(removeElemFromStack, 1000);
+
 ```
+## 3.3 task
+Queue 
+```js
+let arr = [];
+let elem = 0;
+function addElemToStack() {
+    arr.unshift(elem);
+    console.log(arr);
+    elem++;
+}
 
+function removeElemFromStack() {
+    arr.pop();
+    console.log(arr);
+}
 
-
-## 4 task
-`structuredClone(obj)` - глобальный метод, выполняющий глубокое копирование объектов. Корректно работает с undefined, Date, 
-цикилческие ссылки объектов.
-
-
-
+setInterval(addElemToStack, 500);
+setInterval(removeElemFromStack, 1000);
+```
 ## 1 bonus
 ```js
-const deepEqual =(arg1, arg2) => {
-    if(typeof arg1 !== 'object' || typeof arg2 !== 'object')return arg1 === arg2;  
-    if(arg1 === arg2) return true;
-    if(Array.isArray(arg1)) return arg1.map((el, i) => deepEqual(el, arg2[i])).every(el => el === true);
-
-    for(const key in arg1) {
-        if(!deepEqual(arg1[key], arg2[key])) return false;
+ function copyBind(context, func, ...args) {
+    return function () {
+        
+        context.binded = func
+         
+        context.binded(...args)
     }
-
-
-    return true;
-};
-```
-
-
-
-## 2 bonus
-```js
-function reverseStr(str) {
-    return str.split("").reverse().join("");
 }
 ```
+
+
+
+
+
+
+
+
